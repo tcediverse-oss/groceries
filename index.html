@@ -1,1 +1,1055 @@
-placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Groceries">
+<meta name="theme-color" content="#1B5E3B">
+<title>Evans Family Groceries</title>
+<style>
+:root {
+  --green: #1B5E3B; --green2: #2D8653; --green3: #4CAF78; --green-pale: #EAF5EE; --green-mid: #B8DEC9;
+  --orange: #D97706; --orange-pale: #FEF3C7;
+  --red: #DC2626; --red-pale: #FEE2E2;
+  --blue: #1D4ED8; --blue-pale: #EFF6FF;
+  --bg: #F3F4F3; --card: #FFFFFF; --text: #111827; --soft: #6B7280; --border: #E5E7EB;
+  --nav: 62px; --hdr: 54px;
+  --radius: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);overscroll-behavior:none;}
+body{display:flex;flex-direction:column;}
+
+/* HEADER */
+header{height:var(--hdr);background:var(--green);color:#fff;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.2);position:sticky;top:0;z-index:200;}
+header .hdr-text h1{font-size:17px;font-weight:700;letter-spacing:-.2px;}
+header .hdr-text p{font-size:11px;opacity:.75;margin-top:1px;}
+header .hdr-badge{margin-left:auto;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600;white-space:nowrap;}
+
+/* MAIN */
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav) + 10px);}
+.section{display:none;padding:12px 12px 4px;}
+.section.active{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--soft);margin-bottom:12px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;line-height:1;}
+.btn:active{opacity:.7;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-ghost{background:transparent;color:var(--soft);border:1.5px solid var(--border);}
+.btn-red{background:transparent;color:var(--red);border:1.5px solid var(--red);}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:8px;}
+.btn-full{width:100%;margin-top:8px;}
+
+/* INPUTS */
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);
+  appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green2);}
+
+/* PILL */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:13px;font-weight:600;}
+.pill-green{background:var(--green-pale);color:var(--green);}
+.pill-orange{background:var(--orange-pale);color:var(--orange);}
+.pill-red{background:var(--red-pale);color:var(--red);}
+
+/* âââ COSTCO BANNER âââ */
+#costcoBanner{display:none;background:linear-gradient(135deg,#0057A8,#003d7a);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;align-items:center;gap:12px;}
+#costcoBanner.show{display:flex;}
+#costcoBanner .cb-text{flex:1;}
+#costcoBanner .cb-title{font-size:14px;font-weight:700;}
+#costcoBanner .cb-sub{font-size:12px;opacity:.8;margin-top:2px;}
+
+/* âââ LIST TAB âââ */
+.out-item{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);gap:10px;}
+.out-item:last-child{border-bottom:none;}
+.out-item .item-name{flex:1;font-size:15px;}
+.out-item .urgent-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.out-item .urgent-dot.normal{background:var(--border);}
+.out-item .del{background:none;border:none;color:var(--border);font-size:18px;cursor:pointer;padding:2px 4px;line-height:1;}
+.out-item .del:active{color:var(--red);}
+.add-row{display:flex;gap:8px;padding:10px 14px;background:var(--green-pale);border-radius:0 0 var(--radius) var(--radius);}
+.add-row input{flex:1;}
+
+/* âââ PLAN TAB âââ */
+.plan-empty{text-align:center;padding:32px 20px;}
+.plan-empty .pe-icon{font-size:48px;margin-bottom:12px;}
+.plan-empty .pe-title{font-size:17px;font-weight:700;margin-bottom:6px;}
+.plan-empty .pe-sub{font-size:14px;color:var(--soft);line-height:1.5;}
+.plan-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.plan-meta .pm-label{font-size:12px;color:var(--soft);}
+.plan-meta .pm-date{font-size:12px;font-weight:600;color:var(--green2);}
+.store-plan-card{border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.store-plan-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;cursor:pointer;user-select:none;}
+.store-plan-hdr .sp-name{font-size:15px;font-weight:700;flex:1;}
+.store-plan-hdr .sp-count{font-size:12px;opacity:.8;}
+.store-plan-hdr .sp-chevron{font-size:11px;transition:transform .2s;}
+.store-plan-hdr.collapsed .sp-chevron{transform:rotate(-90deg);}
+.store-plan-body{background:var(--card);}
+.store-plan-body.collapsed{display:none;}
+.plan-item{display:flex;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--border);gap:10px;}
+.plan-item:last-child{border-bottom:none;}
+.plan-item .pi-info{flex:1;}
+.plan-item .pi-name{font-size:14px;font-weight:500;}
+.plan-item .pi-note{font-size:12px;color:var(--soft);margin-top:2px;}
+.plan-item .pi-price{font-size:14px;font-weight:700;color:var(--green2);white-space:nowrap;}
+.plan-item .pi-tag{font-size:11px;background:var(--green-pale);color:var(--green);padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.deal-badge{background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;}
+
+/* store header colors */
+.hdr-saveon{background:linear-gradient(135deg,#C41E3A,#8B0000);}
+.hdr-costco{background:linear-gradient(135deg,#0057A8,#003d7a);}
+.hdr-superstore{background:linear-gradient(135deg,#CC0000,#8B0000);}
+.hdr-walmart{background:linear-gradient(135deg,#0071DC,#004c97);}
+.hdr-nofrills{background:linear-gradient(135deg,#E6A800,#B8860B);color:#1a1a1a!important;}
+.hdr-nofrills .sp-name,.hdr-nofrills .sp-count{color:#1a1a1a;}
+
+/* meal plan in plan tab */
+.meal-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.meal-card-sm{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.meal-card-sm .mc-day{font-size:11px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;}
+.meal-card-sm .mc-dinner{font-size:13px;font-weight:600;margin-top:3px;line-height:1.3;}
+
+/* âââ SHOP TAB âââ */
+.shop-total-bar{background:var(--green);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.shop-total-bar .stb-label{font-size:13px;opacity:.8;flex:1;}
+.shop-total-bar .stb-total{font-size:28px;font-weight:800;letter-spacing:-.5px;}
+.shop-total-bar .stb-sub{font-size:11px;opacity:.7;margin-top:1px;}
+
+.shop-store-section{border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.shop-store-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;color:#fff;cursor:pointer;}
+.shop-store-hdr .ssh-name{font-size:14px;font-weight:700;flex:1;}
+.shop-store-hdr .ssh-subtotal{font-size:14px;font-weight:700;}
+.shop-store-hdr .ssh-chevron{font-size:11px;transition:transform .2s;}
+.shop-store-hdr.collapsed .ssh-chevron{transform:rotate(-90deg);}
+.shop-store-body{background:var(--card);}
+.shop-store-body.collapsed{display:none;}
+
+.shop-item{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);gap:10px;}
+.shop-item:last-child{border-bottom:none;}
+.shop-item.checked{opacity:.45;}
+.shop-item input[type=checkbox]{width:22px;height:22px;accent-color:var(--green);flex-shrink:0;cursor:pointer;}
+.shop-item .si-info{flex:1;min-width:0;}
+.shop-item .si-name{font-size:14px;font-weight:500;white-space:nowraw;overflow:hidden;text-overflow:ellipsis;}
+.shop-item.checked .si-name{text-decoration:line-through;}
+.shop-item .si-note{font-size:11px;color:var(--soft);}
+.shop-item .si-price-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.shop-item .si-price-wrap::before{content:'$';color:var(--soft);font-size:14px;}
+.shop-item input.price-input{width:90px;padding:6px 8px;font-size:14px;font-weight:600;text-align:right;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);}
+.shop-item input.price-input:focus{border-color:var(--green2);background:#fff;}
+.shop-item .del-si{background:none;border:none;color:var(--border);font-size:16px;cursor:pointer;padding:2px 4px;}
+.shop-item .del-si:active{color:var(--red);}
+.shop-item .si-qty-wrap{display:flex;align-items:center;flex-shrink:0;margin-right:3px;}
+.shop-item input.qty-input{width:56px;padding:6px 4px;font-size:14px;font-weight:600;text-align:center;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);}
+.shop-item input.qty-input:focus{border-color:var(--green2);background:#fff;}
+.si-qty-x{font-size:12px;color:var(--soft);margin:0 3px;flex-shrink:0;}
+
+/* receipt upload */
+.receipt-upload-label{display:block;cursor:pointer;}
+.receipt-preview img{width:100%;border-radius:10px;border:1.5px solid var(--border);margin-top:10px;display:block;}
+
+.add-shop-row{display:flex;gap:8px;padding:10px 14px;background:var(--green-pale);}
+.add-shop-row input[type=text]{flex:1;}
+.add-shop-row input.price-input-sm{width:90px;padding:9px 8px;font-size:14px;text-align:right;border:1.5px solid var(--green-mid);border-radius:8px;background:#fff;}
+
+/* meal edit button */
+.meal-edit-btn{background:var(--bg);border:1.5px solid var(--border);color:var(--soft);font-size:12px;font-weight:600;padding:3px 10px;border-radius:8px;cursor:pointer;flex-shrink:0;white-space:nowrap;line-height:1.4;}
+.meal-edit-btn:active{background:var(--green-pale);border-color:var(--green2);color:var(--green);}
+
+/* âââ MEALS TAB âââ */
+.day-meal-card{background:var(--card);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.dmc-header{background:var(--green);color:#fff;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;}
+.dmc-header .dmc-day{font-size:14px;font-weight:700;}
+.dmc-header .dmc-date{font-size:12px;opacity:.75;}
+.dmc-meal-row{display:flex;align-items:stretch;border-bottom:1px solid var(--border);}
+.dmc-meal-row:last-child{border-bottom:none;}
+.dmc-label{width:28px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--green);writing-mode:vertical-rl;transform:rotate(180deg);flex-shrink:0;}
+.dmc-content{flex:1;padding:9px 12px;}
+.dmc-meal-name{font-size:14px;font-weight:500;line-height:1.3;margin-bottom:4px;}
+.dmc-meal-name.empty{color:var(--soft);font-style:italic;font-weight:400;}
+.dmc-feedback{display:flex;gap:6px;margin-top:4px;}
+.fb-btn{padding:4px 10px;border-radius:16px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;transition:all .15s;font-weight:500;}
+.fb-btn:active{opacity:.7;}
+.fb-btn.active-yes{background:var(--green-pale);border-color:var(--green2);color:var(--green);}
+.fb-btn.active-no{background:var(--red-pale);border-color:var(--red);color:var(--red);}
+.fb-btn.active-like{background:#FFF3CD;border-color:#E6A800;color:#7a5200;}
+.fb-btn.active-dislike{background:var(--red-pale);border-color:var(--red);color:var(--red);}
+
+/* âââ BUDGET TAB âââ */
+.budget-hero{text-align:center;padding:18px 12px 14px;}
+.bh-amount{font-size:44px;font-weight:800;color:var(--green);line-height:1;letter-spacing:-1px;}
+.bh-amount sup{font-size:20px;font-weight:700;vertical-align:top;margin-top:7px;display:inline-block;}
+.bh-label{font-size:13px;color:var(--soft);margin-top:4px;}
+.bh-target{font-size:13px;color:var(--soft);margin-top:6px;}
+.bh-target strong{color:var(--text);}
+.prog-bar{height:10px;background:var(--green-pale);border-radius:5px;overflow:hidden;margin:12px 0 4px;}
+.prog-fill{height:100%;background:var(--green3);border-radius:5px;transition:width .4s;}
+.prog-fill.warn{background:var(--orange);}
+.prog-fill.over{background:var(--red);}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--soft);}
+
+.trip-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;}
+.trip-row:last-child{border-bottom:none;}
+.store-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.d-saveon{background:#C41E3A;}.d-costco{background:#0057A8;}.d-superstore{background:#CC0000;}
+.d-walmart{background:#0071DC;}.d-nofrills{background:#E6A800;}.d-other{background:#9CA3AF;}
+.trip-info{flex:1;}
+.trip-store{font-size:14px;font-weight:600;}
+.trip-date{font-size:12px;color:var(--soft);}
+.trip-amt{font-size:16px;font-weight:700;}
+
+/* âââ BOTTOM NAV âââ */
+nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--card);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -2px 10px rgba(0,0,0,.07);}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--soft);padding:6px 0 2px;}
+nav button.active{color:var(--green);}
+.nav-icon{font-size:22px;line-height:1;}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:.2px;}
+.nav-badge{position:absolute;top:-2px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;min-width:16px;text-align:center;}
+nav button{position:relative;}
+
+/* âââ MISC âââ */
+.empty-state{text-align:center;padding:28px 16px;color:var(--soft);}
+.empty-state .ei{font-size:36px;margin-bottom:8px;}
+.divider{height:1px;background:var(--border);margin:8px 0;}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;}
+.sum-row.total{font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:4px;padding-top:8px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>ð</div>
+  <div class="hdr-text"><h1>Evans Family Groceries</h1><p id="hdrSub">Loadingâ¦</p></div>
+  <div class="hdr-badge" id="hdrBadge"></div>
+</header>
+
+<main>
+
+<!-- âââ LIST TAB âââ -->
+<div class="section active" id="sec-list">
+  <div class="card">
+    <div class="card-title">Running Out Of</div>
+    <div id="outList"><div class="empty-state"><div class="ei">ð</div>Nothing added yet â tap below to add items as you run out</div></div>
+    <div class="add-row">
+      <input type="text" id="outInput" placeholder="Add item we're out ofâ¦" onkeydown="if(event.key==='Enter')addOutItem()">
+      <button class="btn btn-green" onclick="addOutItem()">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Quick Tips</div>
+    <p style="font-size:13px;color:var(--soft);line-height:1.7;">
+      â Add items here as you notice them during the week.<br>
+      ðï¸ Thursday plan is auto-generated by Wednesday evening.<br>
+      ð Tap <strong>Plan</strong> on Thursday to see where to shop.
+    </p>
+  </div>
+</div>
+
+<!-- âââ PLAN TAB âââ -->
+<div class="section" id="sec-plan">
+  <div id="costcoBanner" class="show">
+    <div>ð¦</div>
+    <div class="cb-text">
+      <div class="cb-title">Costco Run Due This Week</div>
+      <div class="cb-sub">Add to Thursday evening â Abbotsford W163</div>
+    </div>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);" onclick="dismissCostco()">Dismiss</button>
+  </div>
+
+  <div id="planContent"></div>
+</div>
+
+<!-- âââ SHOP TAB âââ -->
+<div class="section" id="sec-shop">
+  <div class="shop-total-bar">
+    <div>
+      <div class="stb-label">Running Total</div>
+      <div class="stb-sub" id="shopItemCount">0 items checked</div>
+    </div>
+    <div>
+      <div class="stb-total">$<span id="shopTotal">0.00</span></div>
+    </div>
+  </div>
+  <div id="shopList"></div>
+  <div class="card" style="margin-top:4px;">
+    <button class="btn btn-green btn-full" onclick="completeTrip()">â Complete Trip & Log to Budget</button>
+    <button class="btn btn-ghost btn-full" style="margin-top:8px;" onclick="resetShop()">âº Reset Shopping List</button>
+  </div>
+  <div class="card" style="margin-top:4px;">
+    <div class="card-title">ð· Receipt Photo</div>
+    <p style="font-size:13px;color:var(--soft);margin-bottom:10px;line-height:1.5;">Take a photo of your receipt to keep a record of the trip.</p>
+    <label class="receipt-upload-label" for="receiptInput">
+      <span id="receiptBtn" class="btn btn-ghost btn-full" style="pointer-events:none;">ð· Choose / Take Photo</span>
+    </label>
+    <input type="file" accept="image/*" id="receiptInput" style="display:none;" onchange="previewReceipt(this)">
+    <div id="receiptPreview" class="receipt-preview" style="display:none;">
+      <img id="receiptImg">
+      <button class="btn btn-ghost btn-full" style="margin-top:8px;color:var(--red);border-color:var(--red);" onclick="clearReceipt()">â Remove Photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- âââ MEALS TAB âââ -->
+<div class="section" id="sec-meals">
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-title">This Week's Meal Plan</div>
+    <p style="font-size:13px;color:var(--soft);">Tap <strong>Made it / Skipped</strong> for dinners and lunches. Tap â to edit a breakfast if you do something different.</p>
+  </div>
+  <div id="mealPlanContent"></div>
+</div>
+
+<!-- âââ BUDGET TAB âââ -->
+<div class="section" id="sec-budget">
+  <div class="card">
+    <div class="budget-hero">
+      <div class="bh-amount"><sup>$</sup><span id="budgetTotal">0.00</span></div>
+      <div class="bh-label">spent this month</div>
+      <div class="bh-target">Monthly target: <strong>$1,500 â $1,600</strong></div>
+      <div id="budgetProjected" style="font-size:12px;color:var(--soft);margin-top:4px;min-height:16px;"></div>
+      <div class="prog-bar"><div class="prog-fill" id="budgetBar" style="width:0%"></div></div>
+      <div class="prog-labels"><span>$0</span><span id="budgetStatus" class="pill pill-green" style="margin:0">On Track</span><span>$1,600</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>Trip History</span>
+      <button class="btn btn-sm btn-red" onclick="clearMonth()">Clear month</button>
+    </div>
+    <div id="tripHistory"><div class="empty-state"><div class="ei">ð§¾</div>No trips logged yet</div></div>
+    <div id="weeklyBreakdown"></div>
+    <div id="storeBreakdown"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Log Manual Trip</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <select id="manualStore">
+        <option value="saveon">Save-On Foods</option>
+        <option value="costco">Costco</option>
+        <option value="superstore">Real Cdn Superstore</option>
+        <option value="walmart">Walmart</option>
+        <option value="nofrills">Mike's No Frills</option>
+        <option value="other">Other</option>
+      </select>
+      <div style="position:relative;">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--soft);">$</span>
+        <input type="number" id="manualAmt" placeholder="0.00" style="padding-left:22px;" min="0" step="0.01" inputmode="decimal">
+      </div>
+      <input type="date" id="manualDate">
+      <button class="btn btn-green" onclick="logManualTrip()">Add Trip</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<nav>
+  <button class="active" onclick="showTab('list',this)"><span class="nav-icon">ð</span><span class="nav-label">My List</span><span class="nav-badge" id="listBadge" style="display:none">0</span></button>
+  <button onclick="showTab('plan',this)"><span class="nav-icon">ðï¸</span><span class="nav-label">Plan</span></button>
+  <button onclick="showTab('shop',this)"><span class="nav-icon">ð</span><span class="nav-label">Shop</span><span class="nav-badge" id="shopBadge" style="display:none">0</span></button>
+  <button onclick="showTab('meals',this)"><span class="nav-icon">ð½ï¸</span><span class="nav-label">Meals</span></button>
+  <button onclick="showTab('budget',this)"><span class="nav-icon">ð°</span><span class="nav-label">Budget</span></button>
+</nav>
+
+<script>
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// THURSDAY PLAN DATA â Updated automatically each Wednesday
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const THURSDAY_PLAN = {
+  generated: "2026-03-22",
+  weekLabel: "Mar 26 â Apr 1, 2026",
+  costco_due: true,
+  notes: "Strong week for pork at No Frills. Save-On has good chicken and produce deals. Stock up on potatoes and eggs.",
+  stores: [
+    {
+      key: "saveon",
+      label: "Save-On Foods #2208 â Abbotsford",
+      colorClass: "hdr-saveon",
+      items: [
+        { name: "Chicken drumsticks", note: "Sale $3.99/lb (reg $5.99)", price: "3.99/lb", qty: "3 lbs", deal: true },
+        { name: "Navel oranges", note: "Sale $0.99/lb", price: "0.99/lb", qty: "3 lbs", deal: true },
+        { name: "Salad greens (large)", note: "Regular price", price: "3.99", qty: "1 bag", deal: false },
+        { name: "Fresh strawberries", note: "Sale $3.99/pkt", price: "3.99", qty: "2 pkts", deal: true },
+        { name: "Avocados", note: "3 for $5", price: "1.67 ea", qty: "3", deal: true }
+      ]
+    },
+    {
+      key: "superstore",
+      label: "Real Canadian Superstore â Abbotsford",
+      colorClass: "hdr-superstore",
+      items: [
+        { name: "Russet potatoes", note: "Sale $2.00 / 10 lb bag", price: "2.00", qty: "1 bag", deal: true },
+        { name: "PC cereal (family size)", note: "Sale $5.47", price: "5.47", qty: "2 boxes", deal: true },
+        { name: "Eggs (dozen)", note: "Regular $4.99", price: "4.99", qty: "2 doz", deal: false },
+        { name: "Canned diced tomatoes", note: "PC brand $0.99", price: "0.99", qty: "4 cans", deal: true },
+        { name: "Chicken broth 900ml", note: "PC brand $1.25", price: "1.25", qty: "3", deal: true },
+        { name: "Bread (white/whole wheat)", note: "Regular $3.49", price: "3.49", qty: "2 loaves", deal: false }
+      ]
+    },
+    {
+      key: "walmart",
+      label: "Walmart â Abbotsford (#3019)",
+      colorClass: "hdr-walmart",
+      items: [
+        { name: "Milk 4L", note: "Regular $5.97", price: "5.97", qty: "2", deal: false },
+        { name: "Butter 1 lb", note: "Regular $4.97", price: "4.97", qty: "2", deal: false },
+        { name: "Onions 3 lb bag", note: "Regular $2.47", price: "2.47", qty: "1 bag", deal: false },
+        { name: "Bananas", note: "Regular $0.58/lb", price: "0.58/lb", qty: "2 bunches", deal: false }
+      ]
+    },
+    {
+      key: "nofrills",
+      label: "Mike's No Frills â Abbotsford (#697)",
+      colorClass: "hdr-nofrills",
+      items: [
+        { name: "Pork back ribs", note: "ð¥ 50% OFF â $3.99/lb (reg $7.99)", price: "3.99/lb", qty: "2 lbs", deal: true },
+        { name: "Yellow onions 10 lb", note: "Sale $2.99", price: "2.99", qty: "1 bag", deal: true },
+        { name: "English cucumbers", note: "Sale $0.99 ea", price: "0.99", qty: "2", deal: true }
+      ]
+    },
+    {
+      key: "costco",
+      label: "Costco Wholesale â Abbotsford (W163)",
+      colorClass: "hdr-costco",
+      items: [
+        { name: "Whole chickens (2-pk)", note: "Bulk â best price/lb in Abbotsford", price: "~22.00", qty: "1 pk", deal: false },
+        { name: "Ground beef (3 kg)", note: "Stock the freezer", price: "~28.00", qty: "1 pk", deal: false },
+        { name: "Eggs (18-pk)", note: "Better value than grocery stores", price: "~8.99", qty: "1", deal: false },
+        { name: "Cheddar cheese block", note: "1 kg â lasts 2â3 weeks", price: "~12.99", qty: "1", deal: false },
+        { name: "Rice 10 kg", note: "Restock pantry staple", price: "~14.99", qty: "1 bag", deal: false },
+        { name: "Frozen vegetables", note: "Large bag for quick meals", price: "~8.99", qty: "2 bags", deal: false },
+        { name: "Kids snack bars", note: "Bulk box â school snacks", price: "~16.99", qty: "1 box", deal: false }
+      ]
+    }
+  ],
+  meals: [
+    { day: "Thu", date: "Mar 26", b: "Cereal", l: "Leftovers / sandwiches", d: "Pork ribs (slow cooker) + roasted potatoes" },
+    { day: "Fri", date: "Mar 27", b: "Cereal", l: "Chicken wrap with avocado", d: "Pasta with meat sauce (double batch)" },
+    { day: "Sat", date: "Mar 28", b: "Cereal", l: "Leftover pasta", d: "Sheet pan chicken drumsticks + veggies + rice" },
+    { day: "Sun", date: "Mar 29", b: "Cereal", l: "Grilled cheese & tomato soup", d: "Whole roast chicken + potatoes + salad" },
+    { day: "Mon", date: "Mar 30", b: "Cereal", l: "Leftover chicken wraps", d: "Beef stir-fry + rice + frozen veggies" },
+    { day: "Tue", date: "Mar 31", b: "Cereal", l: "Egg salad sandwiches", d: "Chicken fried rice (uses leftover rice + eggs)" },
+    { day: "Wed", date: "Apr 1", b: "Cereal", l: "Leftover stir-fry", d: "Beef tacos (ground beef, toppings, shells)" }
+  ]
+};
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// STATE
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const STORE_NAMES = { saveon:'Save-On Foods', costco:'Costco', superstore:'Real Cdn Superstore', walmart:'Walmart', nofrills:"Mike's No Frills", other:'Other' };
+const STORE_DOT_CLASS = { saveon:'d-saveon', costco:'d-costco', superstore:'d-superstore', walmart:'d-walmart', nofrills:'d-nofrills', other:'d-other' };
+const STORE_HDR_CLASS = { saveon:'hdr-saveon', costco:'hdr-costco', superstore:'hdr-superstore', walmart:'hdr-walmart', nofrills:'hdr-nofrills', other:'hdr-walmart' };
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('evansGrocery2') || '{}'); } catch(e) { return {}; }
+}
+function saveState(s) { localStorage.setItem('evansGrocery2', JSON.stringify(s)); }
+
+let S = {
+  outItems: [],           // {id, name, addedDate}
+  shopItems: [],          // {storeKey, name, note, qty, expectedPrice, actualPrice, actualQty, checked, id}
+  shopCollapsed: {},
+  mealFeedback: {},       // "Thu-d": {made: true, liked: true}
+  mealOverrides: {},      // "Thu-b": "Custom breakfast text"
+  trips: [],              // {id, store, amount, date, month}
+  costcoDismissed: false,
+  costcoDismissedDate: null,
+  planCollapsed: {},
+  ...loadState()
+};
+
+function persist() { saveState(S); }
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// INIT
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('hdrSub').textContent = now.toLocaleDateString('default',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('hdrBadge').textContent = now.toLocaleDateString('default',{month:'short',year:'numeric'});
+  document.getElementById('manualDate').value = now.toISOString().slice(0,10);
+
+  // If shop items empty, seed from plan
+  if(S.shopItems.length === 0) seedShopFromPlan();
+
+  renderAll();
+  updateListBadge();
+});
+
+function renderAll() {
+  renderOutList();
+  renderPlan();
+  renderShop();
+  renderMeals();
+  renderBudget();
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// TAB NAV
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// LIST TAB â "Running out of"
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function addOutItem() {
+  const inp = document.getElementById('outInput');
+  const name = inp.value.trim();
+  if(!name) return;
+  S.outItems.push({ id: Date.now(), name, addedDate: new Date().toISOString().slice(0,10) });
+  inp.value = '';
+  persist();
+  renderOutList();
+  updateListBadge();
+}
+
+function removeOutItem(id) {
+  S.outItems = S.outItems.filter(i => i.id !== id);
+  persist();
+  renderOutList();
+  updateListBadge();
+}
+
+function renderOutList() {
+  const el = document.getElementById('outList');
+  if(S.outItems.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="ei">ð</div>Nothing added yet â tap below to add items as you run out</div>';
+    return;
+  }
+  el.innerHTML = S.outItems.map(item => `
+    <div class="out-item">
+      <div class="urgent-dot normal"></div>
+      <span class="item-name">${esc(item.name)}</span>
+      <span style="font-size:11px;color:var(--soft);">${fmtDate(item.addedDate)}</span>
+      <button class="del" onclick="removeOutItem(${item.id})">â</button>
+    </div>
+  `).join('');
+}
+
+function updateListBadge() {
+  const b = document.getElementById('listBadge');
+  if(S.outItems.length > 0) { b.style.display='block'; b.textContent=S.outItems.length; }
+  else { b.style.display='none'; }
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// PLAN TAB
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function dismissCostco() {
+  S.costcoDismissed = true;
+  S.costcoDismissedDate = new Date().toISOString().slice(0,10);
+  persist();
+  document.getElementById('costcoBanner').classList.remove('show');
+}
+
+function estimatePlanTotal() {
+  let total = 0;
+  if(!THURSDAY_PLAN.stores) return 0;
+  THURSDAY_PLAN.stores.forEach(store => {
+    store.items.forEach(item => {
+      const priceMatch = String(item.price).match(/[\d.]+/);
+      const price = priceMatch ? parseFloat(priceMatch[0]) : 0;
+      const qtyMatch = String(item.qty || '1').match(/[\d.]+/);
+      const qty = qtyMatch ? parseFloat(qtyMatch[0]) : 1;
+      total += price * qty;
+    });
+  });
+  return total;
+}
+
+function renderPlan() {
+  // Costco banner
+  const showCostco = THURSDAY_PLAN.costco_due && !S.costcoDismissed;
+  document.getElementById('costcoBanner').classList.toggle('show', showCostco);
+
+  const el = document.getElementById('planContent');
+  if(!THURSDAY_PLAN.generated) {
+    el.innerHTML = `
+      <div class="card plan-empty">
+        <div class="pe-icon">ðï¸</div>
+        <div class="pe-title">Plan Not Generated Yet</div>
+        <div class="pe-sub">Your Thursday plan is auto-generated every Wednesday evening. Check back Thursday â your store list and deals will be ready.</div>
+      </div>`;
+    return;
+  }
+
+  const estTotal = estimatePlanTotal();
+
+  // Costco timing from trip history
+  const costcoTrips = (S.trips || []).filter(t => t.store === 'costco').sort((a,b) => b.date.localeCompare(a.date));
+  const lastCostcoTrip = costcoTrips[0];
+  const daysSinceCostco = lastCostcoTrip ? Math.floor((Date.now() - new Date(lastCostcoTrip.date + 'T00:00:00')) / 86400000) : null;
+  const costcoStore = THURSDAY_PLAN.stores ? THURSDAY_PLAN.stores.find(s => s.key === 'costco') : null;
+  const costcoEst = costcoStore ? costcoStore.items.reduce((s,i) => {
+    const p = parseFloat(String(i.price).match(/[\d.]+/)?.[0] || 0);
+    const q = parseFloat(String(i.qty||'1').match(/[\d.]+/)?.[0] || 1);
+    return s + p * q;
+  }, 0) : 0;
+
+  // Stale plan warning
+  const planAge = THURSDAY_PLAN.generated ? Math.floor((Date.now() - new Date(THURSDAY_PLAN.generated + 'T00:00:00')) / 86400000) : 0;
+
+  let html = `
+    <div class="card">
+      <div class="plan-meta">
+        <span class="pm-label">Week of</span>
+        <span class="pm-date">${THURSDAY_PLAN.weekLabel}</span>
+      </div>
+      ${planAge > 6 ? `<div style="background:var(--orange-pale);color:var(--orange);border-radius:8px;padding:7px 11px;font-size:12px;margin-bottom:10px;">â ï¸ Plan is ${planAge} days old â deals may not be current.</div>` : ''}
+      ${THURSDAY_PLAN.notes ? `<p style="font-size:13px;color:var(--soft);margin-bottom:8px;line-height:1.5;">${esc(THURSDAY_PLAN.notes)}</p>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;background:var(--green-pale);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:13px;color:var(--green);font-weight:600;">Est. Plan Total</div>
+          ${costcoEst > 0 ? `<div style="font-size:11px;color:var(--soft);margin-top:2px;">incl. ~$${costcoEst.toFixed(0)} Costco</div>` : ''}
+          <div style="font-size:11px;color:${daysSinceCostco === null || daysSinceCostco >= 18 ? 'var(--orange)' : 'var(--soft)'};margin-top:2px;">
+            Costco: ${daysSinceCostco !== null ? `last run ${daysSinceCostco}d ago` : 'no trips logged'}${daysSinceCostco === null || daysSinceCostco >= 18 ? ' Â· run due' : ''}
+          </div>
+        </div>
+        <span style="font-size:22px;font-weight:800;color:var(--green);">~$${estTotal.toFixed(0)}</span>
+      </div>
+      <button class="btn btn-green btn-full" onclick="showTab('shop',document.querySelectorAll('nav button')[2])">ð Start Shopping Trip</button>
+    </div>`;
+
+  // Stores
+  THURSDAY_PLAN.stores.forEach(store => {
+    const collapsed = S.planCollapsed[store.key];
+    const dealCount = store.items.filter(i => i.deal).length;
+    const storeEst = store.items.reduce((s, item) => {
+      const p = parseFloat(String(item.price).match(/[\d.]+/)?.[0] || 0);
+      const q = parseFloat(String(item.qty||'1').match(/[\d.]+/)?.[0] || 1);
+      return s + p * q;
+    }, 0);
+    html += `
+      <div class="store-plan-card">
+        <div class="store-plan-hdr ${store.colorClass} ${collapsed ? 'collapsed' : ''}" onclick="togglePlanStore('${store.key}')">
+          <span class="sp-name">${store.label}</span>
+          ${dealCount > 0 ? `<span class="deal-badge">ð·ï¸ ${dealCount} deals</span>` : ''}
+          <span class="sp-count">~$${storeEst.toFixed(0)} Â· ${store.items.length} items</span>
+          <span class="sp-chevron">â¼</span>
+        </div>
+        <div class="store-plan-body ${collapsed ? 'collapsed' : ''}">
+          ${store.items.map(item => `
+            <div class="plan-item">
+              <div class="pi-info">
+                <div class="pi-name">${esc(item.name)} ${item.deal ? '<span class="deal-badge">SALE</span>' : ''}</div>
+                <div class="pi-note">${esc(item.note)}${item.qty ? ' Â· ' + esc(item.qty) : ''}</div>
+              </div>
+              <div class="pi-price">$${esc(item.price)}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  });
+
+  // Meal overview
+  html += `<div class="card"><div class="card-title">This Week's Dinners</div><div class="meal-summary">`;
+  THURSDAY_PLAN.meals.forEach(m => {
+    html += `<div class="meal-card-sm"><div class="mc-day">${m.day} ${m.date}</div><div class="mc-dinner">${esc(m.d)}</div></div>`;
+  });
+  html += `</div></div>`;
+
+  el.innerHTML = html;
+}
+
+function togglePlanStore(key) {
+  S.planCollapsed[key] = !S.planCollapsed[key];
+  persist();
+  renderPlan();
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// SHOP TAB
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function seedShopFromPlan() {
+  S.shopItems = [];
+  THURSDAY_PLAN.stores.forEach(store => {
+    store.items.forEach(item => {
+      const qtyMatch = String(item.qty || '1').match(/[\d.]+/);
+      const defaultQty = qtyMatch ? parseFloat(qtyMatch[0]) : 1;
+      S.shopItems.push({
+        id: Date.now() + Math.random(),
+        storeKey: store.key,
+        name: item.name,
+        note: item.note,
+        qty: item.qty,
+        expectedPrice: item.price,
+        actualPrice: '',
+        actualQty: defaultQty,
+        checked: false
+      });
+    });
+  });
+  persist();
+}
+
+function renderShop() {
+  const storeOrder = ['saveon','superstore','walmart','nofrills','costco'];
+  let total = 0; let checkedCount = 0;
+  const container = document.getElementById('shopList');
+  container.innerHTML = '';
+
+  storeOrder.forEach(storeKey => {
+    const items = S.shopItems.filter(i => i.storeKey === storeKey);
+    if(items.length === 0) return;
+
+    const subtotal = items.reduce((s,i) => s + (i.actualPrice ? parseFloat(i.actualPrice) * (parseFloat(i.actualQty)||1) : 0), 0);
+    total += subtotal;
+    checkedCount += items.filter(i => i.checked).length;
+
+    const collapsed = S.shopCollapsed[storeKey];
+    const sec = document.createElement('div');
+    sec.className = 'shop-store-section';
+
+    const hdr = document.createElement('div');
+    hdr.className = `shop-store-hdr ${STORE_HDR_CLASS[storeKey]} ${collapsed ? 'collapsed' : ''}`;
+    hdr.innerHTML = `<span class="ssh-name">${STORE_NAMES[storeKey]}</span><span class="ssh-subtotal">${subtotal > 0 ? '$'+subtotal.toFixed(2) : ''}</span><span class="ssh-chevron">â¼</span>`;
+    hdr.onclick = () => { S.shopCollapsed[storeKey] = !S.shopCollapsed[storeKey]; persist(); renderShop(); };
+
+    const body = document.createElement('div');
+    body.className = 'shop-store-body' + (collapsed ? ' collapsed' : '');
+
+    // Unchecked items first, checked items sink to bottom
+    const sortedItems = [...items].sort((a,b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0));
+
+    sortedItems.forEach(item => {
+      const lineTotal = (parseFloat(item.actualPrice) || 0) * (parseFloat(item.actualQty) || 1);
+      const row = document.createElement('div');
+      row.className = 'shop-item' + (item.checked ? ' checked' : '');
+      row.innerHTML = `
+        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleShopItem(${item.id}, this.checked)">
+        <div class="si-info">
+          <div class="si-name">${esc(item.name)}</div>
+          <div class="si-note">${esc(item.note)}${item.qty ? ' Â· '+esc(item.qty) : ''}${lineTotal > 0 ? `<span style="color:var(--green2);font-weight:700;margin-left:6px;">= $${lineTotal.toFixed(2)}</span>` : ''}</div>
+        </div>
+        <div class="si-qty-wrap">
+          <input class="qty-input" type="number" min="0.1" step="any" inputmode="decimal"
+            value="${item.actualQty || 1}"
+            onchange="setItemQty(${item.id}, this.value)" onblur="setItemQty(${item.id}, this.value)">
+          <span class="si-qty-x">Ã</span>
+        </div>
+        <div class="si-price-wrap">
+          <input class="price-input" type="number" min="0" step="0.01" inputmode="decimal"
+            placeholder="${esc(item.expectedPrice)}" value="${esc(item.actualPrice)}"
+            onchange="setItemPrice(${item.id}, this.value)" onblur="setItemPrice(${item.id}, this.value)">
+        </div>
+        <button class="del-si" onclick="deleteShopItem(${item.id})">â</button>`;
+      body.appendChild(row);
+    });
+
+    // Add item row â name + qty + price
+    const addRow = document.createElement('div');
+    addRow.className = 'add-shop-row';
+    addRow.innerHTML = `
+      <input type="text" placeholder="Add itemâ¦" id="shopAdd-${storeKey}" onkeydown="if(event.key==='Enter')addShopItem('${storeKey}')" style="flex:1;">
+      <input type="number" min="0.1" step="any" inputmode="decimal" placeholder="qty" id="shopAddQty-${storeKey}" style="width:54px;padding:9px 4px;font-size:14px;text-align:center;border:1.5px solid var(--green-mid);border-radius:8px;background:#fff;flex-shrink:0;">
+      <input class="price-input-sm" type="number" min="0" step="0.01" inputmode="decimal" placeholder="$" id="shopAddPrice-${storeKey}">
+      <button class="btn btn-green btn-sm" onclick="addShopItem('${storeKey}')">+</button>`;
+    body.appendChild(addRow);
+
+    sec.appendChild(hdr);
+    sec.appendChild(body);
+    container.appendChild(sec);
+  });
+
+  document.getElementById('shopTotal').textContent = total.toFixed(2);
+  const totalItems = S.shopItems.length;
+  document.getElementById('shopItemCount').textContent = `${checkedCount} of ${totalItems} item${totalItems !== 1 ? 's' : ''} checked`;
+  // Shop nav badge â unchecked items remaining
+  const unchecked = totalItems - checkedCount;
+  const shopBadge = document.getElementById('shopBadge');
+  if(shopBadge) { shopBadge.textContent = unchecked; shopBadge.style.display = (unchecked > 0 && totalItems > 0) ? 'block' : 'none'; }
+}
+
+function toggleShopItem(id, checked) {
+  const item = S.shopItems.find(i => i.id === id);
+  if(item) { item.checked = checked; persist(); renderShop(); }
+}
+
+function setItemPrice(id, val) {
+  const item = S.shopItems.find(i => i.id === id);
+  if(item) { item.actualPrice = val; persist(); renderShop(); }
+}
+
+function setItemQty(id, val) {
+  const item = S.shopItems.find(i => i.id === id);
+  if(item) { item.actualQty = parseFloat(val) || 1; persist(); renderShop(); }
+}
+
+function deleteShopItem(id) {
+  S.shopItems = S.shopItems.filter(i => i.id !== id);
+  persist(); renderShop();
+}
+
+function addShopItem(storeKey) {
+  const nameEl = document.getElementById('shopAdd-' + storeKey);
+  const priceEl = document.getElementById('shopAddPrice-' + storeKey);
+  const qtyEl = document.getElementById('shopAddQty-' + storeKey);
+  const name = nameEl.value.trim();
+  if(!name) return;
+  const actualQty = parseFloat(qtyEl?.value) || 1;
+  S.shopItems.push({ id: Date.now()+Math.random(), storeKey, name, note:'', qty:'', expectedPrice:'', actualPrice: priceEl.value || '', actualQty, checked: false });
+  nameEl.value = ''; priceEl.value = ''; if(qtyEl) qtyEl.value = '';
+  persist(); renderShop();
+  setTimeout(() => document.getElementById('shopAdd-' + storeKey)?.focus(), 100);
+}
+
+function resetShop() {
+  if(!confirm('Reset shopping list from Thursday plan?')) return;
+  seedShopFromPlan();
+  renderShop();
+}
+
+function completeTrip() {
+  const total = S.shopItems.reduce((s,i) => s + (i.actualPrice ? parseFloat(i.actualPrice) * (parseFloat(i.actualQty)||1) : 0), 0);
+  if(total === 0) { alert('Enter some prices before completing the trip.'); return; }
+
+  // Group by store for budget
+  const byStore = {};
+  S.shopItems.forEach(i => {
+    if(i.actualPrice) { byStore[i.storeKey] = (byStore[i.storeKey]||0) + parseFloat(i.actualPrice) * (parseFloat(i.actualQty)||1); }
+  });
+
+  const today = new Date().toISOString().slice(0,10);
+  const month = today.slice(0,7);
+  Object.entries(byStore).forEach(([store, amt]) => {
+    S.trips.push({ id: Date.now()+Math.random(), store, amount: amt, date: today, month });
+  });
+
+  persist();
+  alert(`Trip logged! Total: $${total.toFixed(2)}`);
+  renderBudget();
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// MEALS TAB
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function renderMeals() {
+  const el = document.getElementById('mealPlanContent');
+  if(!THURSDAY_PLAN.meals || !THURSDAY_PLAN.meals.length) {
+    el.innerHTML = '<div class="card"><div class="empty-state"><div class="ei">ð½ï¸</div>Meal plan will appear after Thursday plan is generated.</div></div>';
+    return;
+  }
+
+  el.innerHTML = THURSDAY_PLAN.meals.map(m => {
+    const fb = S.mealFeedback || {};
+    const dKey = m.day + '-d';
+    const dfb = fb[dKey] || {};
+    return `
+    <div class="day-meal-card">
+      <div class="dmc-header">
+        <span class="dmc-day">${m.day}</span>
+        <span class="dmc-date">${m.date}</span>
+      </div>
+      ${renderMealRow('B', m.b, m.day, 'b', false)}
+      ${renderMealRow('L', m.l, m.day, 'l', true)}
+      ${renderMealRow('D', m.d, m.day, 'd', true)}
+    </div>`;
+  }).join('');
+}
+
+function renderMealRow(label, mealName, day, slot, showFeedback) {
+  const key = day + '-' + slot;
+  const fb = (S.mealFeedback || {})[key] || {};
+  const override = (S.mealOverrides || {})[key];
+  const displayName = override !== undefined ? override : (mealName || (slot === 'b' ? 'Cereal' : ''));
+  return `
+    <div class="dmc-meal-row">
+      <div class="dmc-label">${label}</div>
+      <div class="dmc-content">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:${showFeedback ? '6px' : '0'};">
+          <span class="dmc-meal-name ${displayName ? '' : 'empty'}" style="flex:1;margin-bottom:0;">${displayName ? esc(displayName) : 'Not planned'}</span>
+          <button class="meal-edit-btn" onclick="editMeal('${key}')">â Edit</button>
+        </div>
+        ${showFeedback ? `<div class="dmc-feedback">
+          <button class="fb-btn ${fb.made===true?'active-yes':''}" onclick="setFeedback('${key}','made',true)">â Made it</button>
+          <button class="fb-btn ${fb.made===false?'active-no':''}" onclick="setFeedback('${key}','made',false)">Skipped</button>
+          ${fb.made===true ? `
+          <button class="fb-btn ${fb.liked===true?'active-like':''}" onclick="setFeedback('${key}','liked',true)">ð</button>
+          <button class="fb-btn ${fb.liked===false?'active-dislike':''}" onclick="setFeedback('${key}','liked',false)">ð</button>` : ''}
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+function setFeedback(key, field, value) {
+  if(!S.mealFeedback) S.mealFeedback = {};
+  if(!S.mealFeedback[key]) S.mealFeedback[key] = {};
+  S.mealFeedback[key][field] = value;
+  persist();
+  renderMeals();
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// BUDGET TAB
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const TARGET = 1550;
+
+function logManualTrip() {
+  const store = document.getElementById('manualStore').value;
+  const amount = parseFloat(document.getElementById('manualAmt').value);
+  const date = document.getElementById('manualDate').value || new Date().toISOString().slice(0,10);
+  if(!amount || amount <= 0) return;
+  S.trips.push({ id: Date.now(), store, amount, date, month: date.slice(0,7) });
+  document.getElementById('manualAmt').value = '';
+  persist();
+  renderBudget();
+}
+
+function clearMonth() {
+  if(!confirm('Clear all trips this month?')) return;
+  const m = new Date().toISOString().slice(0,7);
+  S.trips = S.trips.filter(t => t.month !== m);
+  persist();
+  renderBudget();
+}
+
+function renderBudget() {
+  const month = new Date().toISOString().slice(0,7);
+  const trips = S.trips.filter(t => t.month === month).sort((a,b) => b.id - a.id);
+  const total = trips.reduce((s,t) => s+t.amount, 0);
+  const pct = Math.min((total/TARGET)*100, 100);
+
+  document.getElementById('budgetTotal').textContent = total.toFixed(2);
+  const bar = document.getElementById('budgetBar');
+  bar.style.width = pct + '%';
+  bar.className = 'prog-fill' + (pct > 100 ? ' over' : pct > 85 ? ' warn' : '');
+
+  const pill = document.getElementById('budgetStatus');
+  const rem = TARGET - total;
+  if(trips.length === 0) { pill.textContent='No trips yet'; pill.className='pill pill-green'; }
+  else if(total > TARGET*1.03) { pill.textContent=`Over $${Math.abs(rem).toFixed(0)}`; pill.className='pill pill-red'; }
+  else if(total > TARGET*0.85) { pill.textContent=`$${rem.toFixed(0)} left`; pill.className='pill pill-orange'; }
+  else { pill.textContent=`â On Track`; pill.className='pill pill-green'; }
+
+  // Projected month-end spend
+  const projEl = document.getElementById('budgetProjected');
+  if(projEl) {
+    if(trips.length >= 2) {
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+      const dayOfMonth = now.getDate();
+      const projected = Math.round(total * (daysInMonth / dayOfMonth));
+      const projColor = projected > TARGET * 1.05 ? 'var(--red)' : projected > TARGET * 0.95 ? 'var(--orange)' : 'var(--green2)';
+      projEl.innerHTML = `On pace for <strong style="color:${projColor}">~$${projected.toLocaleString()}</strong> this month`;
+    } else { projEl.textContent = ''; }
+  }
+
+  const hist = document.getElementById('tripHistory');
+  if(trips.length === 0) { hist.innerHTML='<div class="empty-state"><div class="ei">ð§¾</div>No trips logged yet</div>'; }
+  else {
+    hist.innerHTML = trips.map(t => `
+      <div class="trip-row">
+        <div class="store-dot ${STORE_DOT_CLASS[t.store]||'d-other'}"></div>
+        <div class="trip-info"><div class="trip-store">${STORE_NAMES[t.store]||t.store}</div><div class="trip-date">${fmtDate(t.date)}</div></div>
+        <div class="trip-amt">$${t.amount.toFixed(2)}</div>
+        <button onclick="deleteTrip(${t.id})" style="background:none;border:none;color:var(--border);font-size:16px;cursor:pointer;padding:2px 6px;" onactive="this.style.color='var(--red)'">â</button>
+      </div>`).join('');
+  }
+
+  // Weekly breakdown
+  const wb = document.getElementById('weeklyBreakdown');
+  if(wb && trips.length > 0) {
+    const now = new Date();
+    const weeklyTotals = {};
+    const weekDates = {};
+    trips.forEach(t => {
+      const d = new Date(t.date + 'T00:00:00');
+      const wk = Math.ceil(d.getDate() / 7);
+      weeklyTotals[wk] = (weeklyTotals[wk] || 0) + t.amount;
+      if('weekDates[wk]) weekDates[wk] = {min: d.getDate(), max: d.getDate()};
+      else { weekDates[wk].min = Math.min(weekDates[wk].min, d.getDate()); weekDates[wk].max = Math.max(weekDates[wk].max, d.getDate()); }
+    });
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const mo = months[now.getMonth()];
+    const weeks = Object.keys(weeklyTotals).sort((a,b)=>a-b);
+    const hasMultiWeek = weeks.length > 1;
+    if(hasMultiWeek) {
+      wb.innerHTML = '<div class="divider"></div><div class="card-title" style="margin-top:8px;">By Week</div>' +
+        weeks.map(wk => {
+          const wAmt = weeklyTotals[wk];
+          const hasCostco = trips.some(t => t.store === 'costco' && Math.ceil(new Date(t.date+'T00:00:00').getDate()/7) == wk);
+          return `<div class="sum-row"><span style="color:var(--soft);">${mo} ${weekDates[wk].min}â${weekDates[wk].max}${hasCostco ? ' <span style="font-size:10px;color:#0057A8;font-weight:700;">COSTCO</span>' : ''}</span><span style="font-weight:600;">$${wAmt.toFixed(2)}</span></div>`;
+        }).join('');
+    } else { wb.innerHTML = ''; }
+  } else if(wb) { wb.innerHTML = ''; }
+
+  const byStore = {};
+  trips.forEach(t => { byStore[t.store] = (byStore[t.store]||0) + t.amount; });
+  const bd = document.getElementById('storeBreakdown');
+  if(Object.keys(byStore).length > 0) {
+    bd.innerHTML = '<div class="divider"></div><div class="card-title" style="margin-top:8px;">By Store</div>' +
+      Object.entries(byStore).sort((a,b)=>b[1]-a[1]).map(([s,a]) => `
+        <div class="sum-row"><span style="display:flex;align-items:center;gap:8px;"><span class="store-dot ${STORE_DOT_CLASS[s]||'d-other'}" style="display:inline-block"></span>${STORE_NAMES[s]||s}</span><span>$${a.toFixed(2)}</span></div>
+      `).join('') +
+      `<div class="sum-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+  } else { bd.innerHTML = ''; }
+}
+
+function deleteTrip(id) {
+  S.trips = S.trips.filter(t => t.id !== id);
+  persist(); renderBudget();
+}
+
+function getMealFromPlan(key) {
+  const parts = key.split('-');
+  const day = parts[0], slot = parts[1];
+  const meal = (THURSDAY_PLAN.meals || []).find(m => m.day === day);
+  return meal ? (meal[slot] || '') : '';
+}
+
+function editMeal(key) {
+  const slot = key.split('-')[1];
+  const planDefault = getMealFromPlan(key) || (slot === 'b' ? 'Cereal' : '');
+  const current = (S.mealOverrides || {})[key] !== undefined ? S.mealOverrides[key] : planDefault;
+  const val = prompt('Edit meal:', current);
+  if(val === null) return;
+  if(!S.mealOverrides) S.mealOverrides = {};
+  S.mealOverrides[key] = val.trim() || planDefault;
+  persist();
+  renderMeals();
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// RECEIPT UPLOAD
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function previewReceipt(input) {
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('receiptImg').src = e.target.result;
+    document.getElementById('receiptPreview').style.display = 'block';
+    document.getElementById('receiptBtn').textContent = 'ð· Change Photo';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function clearReceipt() {
+  document.getElementById('receiptInput').value = '';
+  document.getElementById('receiptImg').src = '';
+  document.getElementById('receiptPreview').style.display = 'none';
+  document.getElementById('receiptBtn').textContent = 'ð· Choose / Take Photo';
+}
+
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// UTILS
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function fmtDate(iso) {
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]+' '+parseInt(d);
+}
+</script>
+</body>
+</html>
